@@ -1,62 +1,66 @@
 
 import sys
 
+from arch import Arch
 from formats.r_format import RFormat
 from formats.i_format import IFormat
 
+
 def main():
-	with open('ins', 'r') as f:
-		for line in f:
-			sep = list(line) # separate each hex digit into list element
-			s = int(line, 16) # convert str to short int
 
-			if int(sep[2],16) == 0: # opcode check for r-format
+    with open('ins', 'r') as f:
+        for line in f:
+            sep = list(line)  # separate each hex digit into list element
+            s = int(line, 16)  # convert str to short int
 
-				r = RFormat() # initialize new r-format object
+            if int(sep[2], 16) == 0:  # opcode check for r-format
 
-				r.ins = s # set instruction
-				r.opcode = (s & r.R_MASKS["opcode"]) >> (32-6)
-				r.src1 = (s & r.R_MASKS["s1"]) >> 21
-				r.src2 = (s & r.R_MASKS["s2"]) >> 16
-				r.dest = (s & r.R_MASKS["dest"]) >> 11
-				r.shamt = (s & r.R_MASKS["shamt"]) >> 6
+                r = RFormat()  # initialize new r-format object
 
-				func = (s & r.R_MASKS["func"]) # preliminary func
+                r.ins = s  # set instruction
+                r.opcode = (s & r.R_MASKS["opcode"]) >> (32-6)
+                r.src1 = (s & r.R_MASKS["s1"]) >> 21
+                r.src2 = (s & r.R_MASKS["s2"]) >> 16
+                r.dest = (s & r.R_MASKS["dest"]) >> 11
+                r.shamt = (s & r.R_MASKS["shamt"]) >> 6
 
-				# find correct matching function
-				for option in r.func_options.keys():
-					if func == option:
-						# set function in instruction object
-						r.func = r.func_options[func]
+                func = (s & r.R_MASKS["func"])  # preliminary func
 
-				# format and print out full instruction
-				print(r.full_ins())
+                # find correct matching function
+                for option in r.func_options.keys():
+                    if func == option:
+                        # set function in instruction object
+                        r.func = r.func_options[func]
 
-			else:
-				
-				i = IFormat() # initialize new i-format object
+                # format and print out full instruction
+                print(r.full_ins())
 
-				i.ins = s # set instruction
-				i.opcode = (s & i.I_MASKS["opcode"]) >> (32-6)
-				i.src1 = (s & i.I_MASKS["s1"]) >> 21
-				i.dest_src = (s & i.I_MASKS["ds"]) >> 16
-				i.offset = (s & i.I_MASKS["off"])
+            else:
 
-				# find correct matching operation
-				for op in i.ops.keys():
-					if i.opcode == op:
-						# set string equivalent instruction (e.g. "lw", "sw")
-						i.op = i.ops[i.opcode]
+                i = IFormat()  # initialize new i-format object
 
-				# check for branch operations
-				if (i.op == i.ops[0x4]) or (i.op == i.ops[0x5]): # beq or bne
-					print(i.full_ins(branch=True)) # print with branch formatting
-				
-				# sign offset if instruction is lw or sw
-				elif (i.op == i.ops[0x23]) or (i.op == i.ops[0x2b]):
-					i.offset = i.signed_offset()
-					# format and print out full instruction
-					print(i.full_ins())
+                i.ins = s  # set instruction
+                i.opcode = (s & i.I_MASKS["opcode"]) >> (32-6)
+                i.src1 = (s & i.I_MASKS["s1"]) >> 21
+                i.dest_src = (s & i.I_MASKS["ds"]) >> 16
+                i.offset = (s & i.I_MASKS["off"])
 
-if __name__=='__main__':
+                # find correct matching operation
+                for op in i.ops.keys():
+                    if i.opcode == op:
+                        # set string equivalent instruction (e.g. "lw", "sw")
+                        i.op = i.ops[i.opcode]
+
+                if (i.op == i.ops[0x20]) or (i.op == i.ops[0x28]) or (i.op == i.ops[0x23]) or (i.op == i.ops[0x2b]):
+                    i.offset = i.signed_offset()
+                    # format and print out full instruction
+                    print(i.full_ins())
+
+    # initialize architecture class
+    a = Arch()
+    a.develop_memory()
+    a.develop_registers()
+
+
+if __name__ == '__main__':
     main()

@@ -39,7 +39,7 @@ class IFormat():
         return hex(instruction)
 
     def format(self):
-        return f'${self.dest_src}, {self.offset}(${self.src1})'
+        return f'{self.op} ${self.dest_src}, {self.offset}(${self.src1})'
 
     # convert offset value to signed int
 

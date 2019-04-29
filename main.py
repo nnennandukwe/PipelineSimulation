@@ -2,14 +2,28 @@
 import sys
 
 from arch import Arch
+from pipelines.if_id import IF_ID
 from formats.r_format import RFormat
 from formats.i_format import IFormat
 
 
 def main():
 
+    # initialize architecture class
+    a = Arch()
+    a.develop_memory()
+    a.develop_registers()
+
+    # initialize all stages
+    ifid = IF_ID()
+    print(ifid.write.get())
+
+    count = 0
+    incremented_pc = 0x7A000
     with open('ins', 'r') as f:
         for line in f:
+            count = count + 1
+            incremented_pc += 4
             sep = list(line)  # separate each hex digit into list element
             s = int(line, 16)  # convert str to short int
 
@@ -35,6 +49,21 @@ def main():
                 # format and print out full instruction
                 print(r.full_ins())
 
+                # add to Architecture dictionary
+                a.hash[count] = dict(
+                    pc=hex(incremented_pc),
+                    addr=r.format(),
+                    ins=r.as_hex(),
+                    opcode=r.opcode,
+                    src1=r.src1,
+                    src2=r.src2,
+                    dest=r.dest,
+                    shamt=r.shamt,
+                    func=r.func,
+                    raw_func=hex(func)[2:],
+                )
+                a.example.append(r.full_ins())
+
             else:
 
                 i = IFormat()  # initialize new i-format object
@@ -56,10 +85,21 @@ def main():
                     # format and print out full instruction
                     print(i.full_ins())
 
-    # initialize architecture class
-    a = Arch()
-    a.develop_memory()
-    a.develop_registers()
+                # add to Architecture dictionary
+                a.hash[count] = dict(
+                    pc=hex(incremented_pc),
+                    addr=i.format(),
+                    ins=i.as_hex(i.ins),
+                    opcode=i.opcode,
+                    src1=i.src1,
+                    dest_src=i.dest_src,
+                    offset=i.offset,
+                    func=i.op,
+                )
+                a.example.append(i.full_ins())
+
+    a.print_hash()
+    a.pipeline()
 
 
 if __name__ == '__main__':

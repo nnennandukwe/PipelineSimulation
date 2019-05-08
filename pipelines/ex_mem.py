@@ -84,8 +84,12 @@ class Control:
                 'ReadReg1Value') - hash_table.get('ReadReg2Value')
             self.WriteRegNum = hash_table.get('WriteReg_15_11')
 
-    def print_out(self):
+    def print_out(self, write=None, read=None):
 
+        if write:
+            print("*** EX/MEM Write (written to by the EX Stage) ***")
+        elif read:
+            print("*** EX/MEM Read (read by the MEM Stage) ***")
         print("Control: MemRead = {}, MemWrite = {}, Branch = {}, MemToReg = {}, RegWrite = {},         {}".format(
             self.MemRead, self.MemWrite, self.Branch, self.MemToReg, self.RegWrite, self.Address_Func
         ))
@@ -95,3 +99,5 @@ class Control:
         print("SWValue = {}     WriteRegNum = {}".format(
             self.SWValue, self.WriteRegNum
         ))
+        print()
+        print()

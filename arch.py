@@ -58,20 +58,21 @@ class Arch:
         return self.Regs
 
     def Print_out_everything(self):
-        self.ifid.write.print_out()
-        self.ifid.read.print_out()
-        self.idex.write.print_out()
-        self.idex.read.print_out()
-        self.exmem.write.print_out()
-        self.exmem.read.print_out()
-        self.memwb.write.print_out()
-        self.memwb.read.print_out()
+        self.ifid.write.print_out(write=True)
+        self.ifid.read.print_out(read=True)
+        self.idex.write.print_out(write=True)
+        self.idex.read.print_out(read=True)
+        self.exmem.write.print_out(write=True)
+        self.exmem.read.print_out(read=True)
+        self.memwb.write.print_out(write=True)
+        self.memwb.read.print_out(read=True)
+        for reg in self.Regs:
+            print(hex(reg))
 
     def WB_stage(self):
         memwb_dict = self.memwb.read.get()
         wrn = memwb_dict.get('WriteRegNum')
         if memwb_dict.get('Address_Func') == '[lb]' and not memwb_dict.get('ALUResult', None).isalpha():
-            # print(memwb_dict['ALUResult'])
             self.Regs[memwb_dict['WriteRegNum']
                       ] = memwb_dict['ALUResult']
             print("${} is set to a new value of {} at memory address {}".format(
@@ -102,6 +103,7 @@ class Arch:
 
     def pipeline(self):
         for key, value in self.hash.items():
+            print("*** CLOCK CYCLE {} ***".format(key))
             self.IF_stage(value)
             self.ID_stage()
             self.EX_stage()

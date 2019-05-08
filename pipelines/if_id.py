@@ -37,7 +37,13 @@ class Control:
         ))
         cls.hash = hash_table
 
-    def print_out(self):
+    def print_out(self, read=None, write=None):
+        if write:
+            print("*** IF/ID Write (written to by the IF Stage) ***")
+        elif read:
+            print("*** IF/ID Read (read by the ID Stage) ***")
         print("Inst = {}    [ {} ]  IncrPC = {}".format(
             self.Inst, self.address, self.IncrPC
         ))
+        print()
+        print()

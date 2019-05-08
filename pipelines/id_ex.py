@@ -141,8 +141,12 @@ class Control:
 
             self.hash = hash_table
 
-    def print_out(self):
+    def print_out(self, write=None, read=None):
 
+        if write:
+            print("*** ID/EX Write (written to by the ID Stage) ***")
+        elif read:
+            print("*** ID/EX Read (read by the EX Stage) ***")
         print("Control: RegDst = {}, ALUSrc = {}, ALUOp = {}, MemRead = {}, MemWrite = {}, Branch = {}, MemToReg = {}, RegWrite = {},      {}".format(
             self.RegDst, self.ALUSrc, self.ALUOp, self.MemRead, self.MemWrite, self.Branch, self.MemToReg, self.RegWrite, self.Address_Func
         ))
@@ -152,3 +156,5 @@ class Control:
         print("SEOffset = {}    WriteReg_20_16 = {}     WriteReg_15_11 = {}     Function = {}".format(
             self.SEOffset, self.WriteReg_20_16, self.WriteReg_15_11, self.Function
         ))
+        print()
+        print()

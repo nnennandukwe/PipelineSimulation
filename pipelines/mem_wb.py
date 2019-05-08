@@ -50,7 +50,12 @@ class Control:
             self.LWDataValue = self.ALUResult
             self.ALUResult = "X"
 
-    def print_out(self):
+    def print_out(self, write=None, read=None):
+
+        if write:
+            print("*** MEM/WB Write (written to by the MEM Stage) ***")
+        elif read:
+            print("*** MEM/WB Read (read by the WB Stage) ***")
         print("Control: MemToReg = {}, RegWrite = {},       {}".format(
             self.MemToReg, self.RegWrite, self.Address_Func
         ))
@@ -68,3 +73,5 @@ class Control:
             print("(value {} written to memory address {})".format(
                 hex(self.SWValue), self.ALUResult
             ))
+        print()
+        print()

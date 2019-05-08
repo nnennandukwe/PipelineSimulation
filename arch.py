@@ -55,48 +55,44 @@ class Arch:
             self.Regs.append(0x100 + i)
 
         self.Regs[0x0] = 0
-        # print(self.Regs)
         return self.Regs
 
-    def Print_out_everything():
-        pass
+    def Print_out_everything(self):
+        self.ifid.write.print_out()
+        self.ifid.read.print_out()
+        self.idex.write.print_out()
+        self.idex.read.print_out()
+        self.exmem.write.print_out()
+        self.exmem.read.print_out()
+        self.memwb.write.print_out()
+        self.memwb.read.print_out()
 
     def WB_stage(self):
-        print('made it to the WB stage...')
-        print(self.memwb.write.get())
+        memwb_dict = self.memwb.read.get()
+        wrn = memwb_dict.get('WriteRegNum')
+        if memwb_dict.get('Address_Func') == '[lb]' and not memwb_dict.get('ALUResult', None).isalpha():
+            # print(memwb_dict['ALUResult'])
+            self.Regs[memwb_dict['WriteRegNum']
+                      ] = memwb_dict['ALUResult']
+            print("${} is set to a new value of {} at memory address {}".format(
+                wrn, hex(memwb_dict['LWDataValue']),
+            ))
 
     def MEM_stage(self):
-        print('made it to the mem stage')
         self.memwb.write.set(self.exmem.read.get())
-        print("IN MEM/WEB STAGE ------ ", self.memwb.write.get())
-        # self.memwb.transfer()
-        print(self.memwb.read.get())
-        # self.WB_stage()
+        if self.memwb.write.get().get('Address_Func') == '[lb]' and not self.memwb.write.get().get('ALUResult').isalpha():
+            ALUResult = self.memwb.write.get().get('ALUResult')
+            FoundAddr = self.Main_Mem[ALUResult]
+            self.memwb.write.FoundAddr = FoundAddr
 
     def EX_stage(self):
         self.exmem.write.set(self.idex.read.get())
-        print('You have made it to the EX stage')
-        # self.exmem.transfer()
-        print("IN EX/MEM", self.exmem.read.get())
-        # self.MEM_stage()
 
     def ID_stage(self):
-        # print("IN IFID ----", self.ifid.read.get())
-        print('you are now in the id stage')
-        print("IFID ----", self.ifid.read.get())
         self.idex.write.set(self.ifid.read.get()['hash'])
-        # self.idex.transfer()
-        print("IN IDEX ----", self.idex.read.get())
-        # self.EX_stage()
 
     def IF_stage(self, hash_table):
-        print('in the IF METHODDDD')
         self.ifid.write.set(hash_table)
-        # self.ifid.transfer()
-        # self.ID_stage()
-
-    def print_hash(self):
-        print(self.hash)
 
     def Copy_write_to_read(self):
         self.ifid.transfer()
@@ -105,7 +101,6 @@ class Arch:
         self.memwb.transfer()
 
     def pipeline(self):
-        # for cycle in range(len(self.hash)):
         for key, value in self.hash.items():
             self.IF_stage(value)
             self.ID_stage()
@@ -113,5 +108,5 @@ class Arch:
             self.MEM_stage()
             self.WB_stage()
 
-            print('called {} TIMES'.format(key))
             self.Copy_write_to_read()
+            self.Print_out_everything()

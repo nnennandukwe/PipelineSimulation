@@ -16,7 +16,6 @@ def main():
 
     # initialize all stages
     ifid = IF_ID()
-    print(ifid.write.get())
 
     count = 0
     incremented_pc = 0x7A000
@@ -45,9 +44,6 @@ def main():
                     if func == option:
                         # set function in instruction object
                         r.func = r.func_options[func]
-
-                # format and print out full instruction
-                print(r.full_ins())
 
                 # add to Architecture dictionary
                 a.hash[count] = dict(
@@ -82,8 +78,6 @@ def main():
 
                 if (i.op == i.ops[0x20]) or (i.op == i.ops[0x28]) or (i.op == i.ops[0x23]) or (i.op == i.ops[0x2b]):
                     i.offset = i.signed_offset()
-                    # format and print out full instruction
-                    print(i.full_ins())
 
                 # add to Architecture dictionary
                 a.hash[count] = dict(
@@ -98,7 +92,6 @@ def main():
                 )
                 a.example.append(i.full_ins())
 
-    a.print_hash()
     a.pipeline()
 
 
